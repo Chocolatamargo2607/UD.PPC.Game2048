@@ -119,11 +119,12 @@
 
             <Button
                 android:id="@+id/button2"
-                android:layout_width="wrap_content"
+                android:layout_width="127dp"
                 android:layout_height="match_parent"
                 android:text="Restore Game"
                 tools:layout_editor_absoluteX="133dp"
                 tools:layout_editor_absoluteY="389dp" />
+
             <Button
                 android:id="@+id/btn_newGame"
                 android:layout_width="wrap_content"
