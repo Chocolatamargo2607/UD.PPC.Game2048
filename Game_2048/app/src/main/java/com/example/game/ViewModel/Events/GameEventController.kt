@@ -14,7 +14,7 @@ class GameEventController(
 ) {
     fun eventGrid(event: MotionEvent): Boolean {
         var gameCurrentStateDTO: GameCurrentStateDTO = mainViewModel.observableGameCurrentStateDTO.value ?: return false
-        gameCurrentStateDTO = movementEvent.movement(
+        gameCurrentStateDTO = movementEvent.movementInBoard(
             event,
             gameCurrentStateDTO,
             context,

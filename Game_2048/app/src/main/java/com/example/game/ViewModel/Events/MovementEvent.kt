@@ -17,57 +17,59 @@ class MovementEvent {
     private val calculateIndexCol:(area:Int,row:Int,col:Int) -> Int = {
         area,row,col-> area.times(row-1)+(col-1)
     }
-    // Var para modificar valor de ficha ganadora
-    private val verifyWinBoxInBoard: (List<Int>) -> Unit = { board ->
-        if (board.find { value -> value == 2048 } != null) {
-            throw Error("You Won!")
-        }
-    }
-    fun movement(
+    fun movementInBoard(
         event: MotionEvent,
         gameCurrentStateDTO: GameCurrentStateDTO,
         context: Context,
-        alertEvent:()->Unit
-    ):GameCurrentStateDTO{
-
+        alertEvent: () -> Unit
+    ): GameCurrentStateDTO {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                this.lastX = event.x;
-                this.lastY = event.y;
+                lastX = event.x
+                lastY = event.y
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 val movementDirection: MovementDirection? = resolveOrientationEvent(
-                    event.x - this.lastX,
-                    event.y - this.lastY
+                    event.x - lastX,
+                    event.y - lastY
                 )
-                this.lastY = 0f;
-                this.lastX = 0f;
-                if(movementDirection is MovementDirection){
-                    try {
-                        val result:Pair<Number,List<Int>> = this.executeMovement(
-                            movementDirection,
-                            gameCurrentStateDTO.score,
-                            gameCurrentStateDTO.board
-                        )
-                        gameCurrentStateDTO.board =  result.second as LinkedList<Int>
-                        gameCurrentStateDTO.score = result.first.toInt()
-                        gameCurrentStateDTO.best = if(gameCurrentStateDTO.score>gameCurrentStateDTO.best)gameCurrentStateDTO.score
-                        else
-                            gameCurrentStateDTO.best
-                        verifyWinBoxInBoard(gameCurrentStateDTO.board)
-                    }catch (e:Error){
-                        val message:String = if (e.message==null) "Error" else e.message!!
-                        showAlert(context,
-                            message,
-                            "New Game",
-                            alertEvent
-                        )
-                    }
+                lastY = 0f
+                lastX = 0f
+                if (movementDirection is MovementDirection) {
+                    executeMovementAndHandleErrors(
+                        movementDirection,
+                        gameCurrentStateDTO,
+                        context,
+                        alertEvent
+                    )
                 }
             }
         }
         return gameCurrentStateDTO
     }
+
+    private fun executeMovementAndHandleErrors(
+        movementDirection: MovementDirection,
+        gameCurrentStateDTO: GameCurrentStateDTO,
+        context: Context,
+        alertEvent: () -> Unit
+    ) {
+        try {
+            val result: Pair<Number, List<Int>> = executeMovement(
+                movementDirection,
+                gameCurrentStateDTO.score,
+                gameCurrentStateDTO.board
+            )
+            gameCurrentStateDTO.board = result.second as LinkedList<Int>
+            gameCurrentStateDTO.score = result.first.toInt()
+            gameCurrentStateDTO.best = if (gameCurrentStateDTO.score > gameCurrentStateDTO.best) gameCurrentStateDTO.score else gameCurrentStateDTO.best
+            verifyWinBoxInBoard(gameCurrentStateDTO.board)
+        } catch (e: Error) {
+            val message: String = e.message ?: "Error"
+            showAlert(context, message, "New Game", alertEvent)
+        }
+    }
+
     private fun showAlert(context:Context,title:String,buttonMessage:String,event:()->Unit){
         AlertDialog.Builder(context)
             .setTitle(title)
@@ -80,8 +82,8 @@ class MovementEvent {
         board: List<Int>
     ): Pair<Number,List<Int>>{
         val area:Int = calculateToArea(board.size)
-        verifyGameOverInBoard(board,area)
-        val resultMovement:Pair<Number, LinkedList<Int>> = horizontalAndVerticalMovement(
+        verifyingLoss(board,area)
+        val resultMovement:Pair<Number, LinkedList<Int>> = hAndVMovement(
             direction,
             score,
             board,
@@ -114,23 +116,24 @@ class MovementEvent {
     private fun verifyBoxEmptyInBoard(board: LinkedList<Int>):Boolean{
         return board.find { it == 0 } is Int
     }
-    private fun verifyGameOverInBoard(board: List<Int>,area: Int = calculateToArea(board.size)){
+    private fun verifyingLoss(board: List<Int>, area: Int = calculateToArea(board.size)){
         for (i in MovementDirection.entries){
             if (
                 !equalsBoards(
                     board,
-                    horizontalAndVerticalMovement(i,0,board,area).second
+                    hAndVMovement(i,0,board,area).second
                 )
             ){
                 return
             }
         }
-        throw Error("Game Over!")
+        throw Error("You lost!")
     }
+
 
     private fun generatorRandomValue(board: LinkedList<Int>):LinkedList<Int>{
         if (!verifyBoxEmptyInBoard(board))
-            throw Error("Game Over!")
+            throw Error("You lost!")
         val range = board.indices
         val valueRandom:Int = listOf(2,4).random()
         var  i = true
@@ -144,67 +147,64 @@ class MovementEvent {
         return board
     }
 
-    private fun horizontalAndVerticalMovement(
+    private fun hAndVMovement(
         direction: MovementDirection,
-        scoreSum:Int,
+        scoreSum: Int,
         board: List<Int>,
-        area:Int = calculateToArea(board.size)
-    ):Pair<Number,LinkedList<Int>> {
-        var newScoreSum = scoreSum;
-        var newBoard: MutableList<Int> = board.toMutableList()
-        val getElementToBoard = if(
-            direction == MovementDirection.RIGHT ||
-            direction == MovementDirection.LEFT
-        ){
-            ::getRowToBoard
-        }else {
-            ::getColumnBoard
+        area: Int = calculateToArea(board.size)
+    ): Pair<Int, LinkedList<Int>> {
+        var newScoreSum = scoreSum
+        val newBoard = LinkedList(board) // Convertir a LinkedList para mantener la estructura
+        val getElementToBoard = when (direction) {
+            MovementDirection.RIGHT, MovementDirection.LEFT -> ::getRowToBoard
+            else -> ::getColumnBoard
         }
-        for (element in 1..area){
-            val resultElement:Pair<List<Int>,List<Int>> = getElementToBoard(element,board,area)
-            val elementValues: MutableList<Int> = resultElement.first.map { it }.toMutableList()
-            if (direction == MovementDirection.RIGHT ||direction == MovementDirection.DOWN){
-                elementValues.reverse()
+        for (element in 1..area) {
+            val (elementValues, indices) = getElementToBoard(element, board, area)
+            val (resultScore, resultElement) = turn(elementValues.toMutableList())
+            newScoreSum += resultScore
+            val newElement = if (direction == MovementDirection.RIGHT || direction == MovementDirection.DOWN) {
+                resultElement.reversed()
+            } else {
+                resultElement
             }
-            val result:Pair<Int, MutableList<Int>> = shift(elementValues)
-            val newElement = if (direction == MovementDirection.RIGHT ||direction == MovementDirection.DOWN){
-                result.second.reverse()
-                result.second
-            }else
-                result.second
-            newBoard = replaceElement(newBoard,newElement,resultElement.second)
-            newScoreSum += result.first
+            replaceElement(newBoard, newElement.toMutableList(), indices)
         }
-        return Pair(newScoreSum,LinkedList(newBoard))
+        return Pair(newScoreSum, newBoard)
     }
-    private fun shift(
-        element:MutableList<Int>,
-    ):Pair<Int,MutableList<Int>>{
-        var i = 0
+
+    private fun turn(element: MutableList<Int>): Pair<Int, MutableList<Int>> {
         var score = 0
-        val size = element.size;
-        while (i < size){
+        var i = 0
+
+        while (i < element.size) {
             var j = i + 1
-            while (j < size){
-                if (element[i]!=0 && element[i] == element[j]){
-                    element[i] += element[j]
-                    score += element[i]
-                    element[j] = 0
-                    i++
-                }else if(element[i] == 0 && element[j] != 0){
-                    element[i] = element[j]
-                    element[j] = 0
-                }else if(element[j] != 0){
-                    i++
-                    if(element[i] == 0)
-                        j--
+
+            while (j < element.size) {
+                when {
+                    element[i] != 0 && element[i] == element[j] -> {
+                        element[i] += element[j]
+                        score += element[i]
+                        element[j] = 0
+                        i++
+                    }
+                    element[i] == 0 && element[j] != 0 -> {
+                        element[i] = element[j]
+                        element[j] = 0
+                    }
+                    element[j] != 0 -> {
+                        i++
+                        if (element[i] == 0) j--
+                    }
                 }
                 j++
             }
             i++
         }
-        return  Pair(score,element)
+
+        return Pair(score, element)
     }
+
     private fun replaceElement(
         board: MutableList<Int>,
         element: MutableList<Int>,
@@ -241,5 +241,11 @@ class MovementEvent {
         val values = board.subList(indexInit,indexInit+area)
         val index = (indexInit..<indexInit + area).toMutableList()
         return Pair(values,index)
+    }
+    // Var para modificar valor de ficha ganadora
+    private val verifyWinBoxInBoard: (List<Int>) -> Unit = { board ->
+        if (board.find { value -> value == 2048 } != null) {
+            throw Error("You Won!")
+        }
     }
 }
