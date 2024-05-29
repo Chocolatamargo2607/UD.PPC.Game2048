@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.example.game.View.BoardElement
 import com.example.game.View.Utils.TextViewAdapter
 
 
@@ -41,7 +42,7 @@ class BoardView(
     }
     private fun adapterListValuesToListTextViews(context: Context, values:List<Short>):List<TextView>{
         val items: List<TextView> = List(values.size,) {
-            ElementBoardView(
+            BoardElement(
                 context,
                 this.columns,
                 values[it].toInt()

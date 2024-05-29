@@ -1,4 +1,4 @@
-package com.example.game.View.Utils
+package com.example.game.View.Profiles
 
 import android.content.Context
 import android.graphics.Color
@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import androidx.core.content.ContextCompat
 import com.example.game.R
+
 
 object ShapeCreator {
     fun createBackground(
