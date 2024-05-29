@@ -12,12 +12,13 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
         android:layout_margin="10dp"
+        android:gravity="center"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="10dp"
-        tools:layout_editor_absoluteY="10dp"
-        android:gravity="center">
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/toolBar"
@@ -40,15 +41,14 @@
                     android:id="@+id/textScore"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
+                    android:background="@drawable/border_button"
                     android:fontFamily="sans-serif-black"
                     android:text="@string/text_score"
                     android:textAlignment="center"
                     android:textAllCaps="true"
                     android:textSize="@dimen/text_size_medium"
-                    android:typeface="sans"
 
-                    android:background="@drawable/border_button"
-                    />
+                    android:typeface="sans" />
 
                 <TextView
                     android:id="@+id/input_text_score"
@@ -76,13 +76,13 @@
                     android:id="@+id/textBest"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
+                    android:background="@drawable/border_button"
                     android:fontFamily="sans-serif-black"
                     android:text="@string/text_best"
                     android:textAlignment="center"
                     android:textAllCaps="true"
                     android:textSize="@dimen/text_size_medium"
-                    android:typeface="normal"
-                    android:background="@drawable/border_button"/>
+                    android:typeface="normal" />
 
                 <TextView
                     android:id="@+id/input_text_best"
@@ -98,7 +98,6 @@
             </LinearLayout>
 
 
-
         </LinearLayout>
 
         <LinearLayout
@@ -110,7 +109,7 @@
 
             <Button
                 android:id="@+id/button1"
-                android:layout_width="wrap_content"
+                android:layout_width="109dp"
                 android:layout_height="match_parent"
                 android:text="Save Game"
 
@@ -119,7 +118,7 @@
 
             <Button
                 android:id="@+id/button2"
-                android:layout_width="127dp"
+                android:layout_width="120dp"
                 android:layout_height="match_parent"
                 android:text="Restore Game"
                 tools:layout_editor_absoluteX="133dp"

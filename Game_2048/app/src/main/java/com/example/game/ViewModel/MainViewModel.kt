@@ -4,20 +4,20 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.game.Model.DTO.GameState
-import com.example.game.ViewModel.Service.GeneratorGameByFunctions
+import com.example.game.Model.DTO.GameCurrentStateDTO
+import com.example.game.ViewModel.Events.GameInterfaceGeneratorBoard
 
 @SuppressLint("ClickableViewAccessibility")
 class MainViewModel:ViewModel() {
-    private val _observableGameState: MutableLiveData<GameState> = MutableLiveData()
-    val observableGameState: LiveData<GameState> get() = _observableGameState
+    private val _observableGameCurrentStateDTO: MutableLiveData<GameCurrentStateDTO> = MutableLiveData()
+    val observableGameCurrentStateDTO: LiveData<GameCurrentStateDTO> get() = _observableGameCurrentStateDTO
 
-    val gridView:GeneratorGameByFunctions = GeneratorGameByFunctions(4);
+    val gridView:GameInterfaceGeneratorBoard = GameInterfaceGeneratorBoard(4);
     init {
-        _observableGameState.value = gridView.gameState
+        _observableGameCurrentStateDTO.value = gridView.gameCurrentStateDTO
     }
-    fun updateGameState(newGameState: GameState){
-        _observableGameState.value = newGameState
+    fun updateGameState(newGameCurrentStateDTO: GameCurrentStateDTO){
+        _observableGameCurrentStateDTO.value = newGameCurrentStateDTO
     }
     override fun onCleared() {
         super.onCleared()

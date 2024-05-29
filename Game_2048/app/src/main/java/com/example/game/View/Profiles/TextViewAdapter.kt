@@ -1,4 +1,4 @@
-package com.example.game.View.Utils
+package com.example.game.View.Profiles
 
 import android.content.Context
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 
+// Adapter para la clase ElementBoardView
 class TextViewAdapter(private val context: Context, private val items: List<TextView>) : BaseAdapter() {
 
     override fun getCount(): Int {

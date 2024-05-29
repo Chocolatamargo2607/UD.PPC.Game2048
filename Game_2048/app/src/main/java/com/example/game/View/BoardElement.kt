@@ -1,4 +1,4 @@
-package com.example.game.View.Components
+package com.example.game.View
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -7,9 +7,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.game.R
-import com.example.game.View.Utils.ShapeCreator
+import com.example.game.View.Profiles.ShapeCreator
 
-class ElementBoardView(
+// Clase que genera los TextView y los componentes del GridView
+class BoardElement(
     contex:Context,
     columns:Int=4,
     value:Int=0

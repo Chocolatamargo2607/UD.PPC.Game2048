@@ -1,4 +1,4 @@
-package com.example.game.View.Components
+package com.example.game.View
 
 
 
@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.example.game.View.Utils.TextViewAdapter
+import com.example.game.View.Profiles.TextViewAdapter
 
-
-class BoardView(
+// Clase que crea el GridView
+class Board(
     context: Context,
     private val columns: Int,
-    var content: List<Short>
+    var content: List<Int>
 ) {
     val grid:GridView;
     private val gap:Int = 4;
@@ -39,15 +39,14 @@ class BoardView(
         this.grid.adapter = TextViewAdapter(context,items)
         return this.grid
     }
-    private fun adapterListValuesToListTextViews(context: Context, values:List<Short>):List<TextView>{
+    private fun adapterListValuesToListTextViews(context: Context, values:List<Int>):List<TextView>{
         val items: List<TextView> = List(values.size,) {
-            ElementBoardView(
+            BoardElement(
                 context,
                 this.columns,
-                values[it].toInt()
+                values[it]
             ).textView
         }
         return items
     }
-
 }

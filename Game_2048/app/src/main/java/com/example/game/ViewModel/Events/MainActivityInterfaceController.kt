@@ -1,4 +1,4 @@
-package com.example.game.ViewModel.Service
+package com.example.game.ViewModel.Events
 
 import android.annotation.SuppressLint
 import android.widget.Button
@@ -13,14 +13,12 @@ import androidx.lifecycle.Observer
 import com.example.game.R
 import com.example.game.ViewModel.MainViewModel
 
-
-// MainActivityUIHandler.kt
-class MainActivityUIHandler(
+class MainActivityInterfaceController(
     private val activity: AppCompatActivity,
     private val mainViewModel: MainViewModel
 ) {
     private lateinit var gridView: GridView
-    private lateinit var gameEventHandler: GameEventHandler
+    private lateinit var gameEventController: GameEventController
 
     @SuppressLint("ClickableViewAccessibility")
     fun setupUI() {
@@ -30,17 +28,17 @@ class MainActivityUIHandler(
         val scoreText: TextView = activity.findViewById(R.id.input_text_score)
 
         gridView = mainViewModel.gridView.generatorBoard(activity)
-        gameEventHandler = GameEventHandler(mainViewModel, EventToMovement(), activity)
+        gameEventController = GameEventController(mainViewModel, MovementEvent(), activity)
 
-        gridView.setOnTouchListener { _, event -> gameEventHandler.eventGrid(event) }
+        gridView.setOnTouchListener { _, event -> gameEventController.eventGrid(event) }
         containerLinearLayout.addView(gridView)
 
         buttonNewGame.setOnClickListener {
-            gameEventHandler.eventNewGame()
+            gameEventController.eventNewGame()
         }
 
-        mainViewModel.observableGameState.observe(activity, Observer {
-            mainViewModel.gridView.gameState = it
+        mainViewModel.observableGameCurrentStateDTO.observe(activity, Observer {
+            mainViewModel.gridView.gameCurrentStateDTO = it
             gridView = mainViewModel.gridView.updateBoard(activity)
             bestText.text = it.best.toString()
             scoreText.text = it.score.toString()
