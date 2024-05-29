@@ -1,7 +1,7 @@
-package com.example.game.Model
+package com.example.game.Model.FirebaseService
 import android.content.Context
-import com.example.game.MainActivity
-import com.example.game.Model.DTO.GameState
+import com.example.game.Model.DTO.GameCurrentStateDTO
+import com.example.game.ViewModel.Events.MainActivityInterfaceController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 
@@ -10,7 +10,7 @@ class GameStateManager {
     private val gson = Gson()
     private val collectionPath = "gameStates" // Colección en Firestore
 
-    fun saveGameState(context: Context, gameState: GameState) {
+    fun saveGameState(context: Context, gameState: GameCurrentStateDTO) {
         val uniqueID = UniqueIDManager.getUniqueID(context)
         val gameStateMap = gson.toJson(gameState).let { gson.fromJson(it, Map::class.java) }
         firestore.collection(collectionPath).document(uniqueID)
@@ -24,14 +24,14 @@ class GameStateManager {
             }
     }
 
-    fun loadGameState(context: MainActivity, userId: String, callback: (GameState?) -> Unit){
+    fun loadGameState(context: Context, userId: String, callback: (GameCurrentStateDTO?) -> Unit) {
         val uniqueID = UniqueIDManager.getUniqueID(context)
         firestore.collection(collectionPath).document(uniqueID)
             .get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val gameStateJson = gson.toJson(document.data)
-                    val gameState = gson.fromJson(gameStateJson, GameState::class.java)
+                    val gameState = gson.fromJson(gameStateJson, GameCurrentStateDTO::class.java)
                     callback(gameState)
                 } else {
                     callback(null)

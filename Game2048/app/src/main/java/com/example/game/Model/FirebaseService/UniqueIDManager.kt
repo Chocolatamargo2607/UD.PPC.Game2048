@@ -1,4 +1,7 @@
+package com.example.game.Model.FirebaseService
+
 import android.content.Context
+import com.example.game.ViewModel.Events.MainActivityInterfaceController
 import android.content.SharedPreferences
 import java.util.UUID
 
