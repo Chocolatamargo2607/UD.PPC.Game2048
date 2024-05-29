@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Game_2048</string>
+    <string name="text_best">Best Score</string>
+    <string name="text_score">Current Score</string>
+    <string name="text_newGame">New Game</string>
+    <string name="text_empty"> </string>
+    <string name="text_init_score">0</string>
+</resources>
